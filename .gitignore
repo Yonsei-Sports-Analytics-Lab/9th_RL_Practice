@@ -1,3 +1,10 @@
+# runs directory
+runs/
+
+# PPO policy files
+ppo_snake_ep*.pth
+ppo_snake_final.pth
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
