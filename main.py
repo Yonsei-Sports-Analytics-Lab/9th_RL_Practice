@@ -101,6 +101,7 @@ def train(policy_path = "", episodes = 10000):
 
 
 if __name__ == '__main__':
-    # 이미 학습된 정책의 추가 학습을 원한다면 아래 string에 경로를 적으면 됩니다
-    policy_path = 'saved_models/260722_0.pth'
+    # 이미 학습된 정책의 추가 학습을 원한다면 아래 from_scratch 값에 False를 넣고 policy_path에 string에 경로를 적으면 됩니다
+    from_scratch = True
+    policy_path = '' if from_scratch else 'saved_models/policy_poo_boo.pth'
     train(policy_path)
