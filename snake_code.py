@@ -63,20 +63,20 @@ class SnakeGame:
     def step(self, action):
         self.frame_iteration += 1
         
-        # 1. 에이전트의 행동(Action)에 따라 이동
+        # 에이전트의 행동(Action)에 따라 이동
         self._move(action)
         self.snake.insert(0, self.head)
         
         reward = -0.01 # 스텝 패널티 (지연 방지)
         game_over = False
 
-        # 2. 게임 종료 조건 확인 (충돌 또는 무한 루프 아사)
+        # 게임 종료 조건 확인 (충돌 또는 무한 루프 아사)
         if self._is_collision() or self.frame_iteration > 100 * len(self.snake):
             game_over = True
             reward = -10
             return self.get_state(), reward, game_over
 
-        # 3. 조밀한 보상 (Dense Reward) 적용
+        # 조밀한 보상 (Dense Reward) 적용
         curr_distance = abs(self.food.x - self.head.x) + abs(self.food.y - self.head.y)
         if curr_distance < self.prev_distance:
             reward += 0.1
@@ -84,7 +84,7 @@ class SnakeGame:
             reward -= 0.1
         self.prev_distance = curr_distance
 
-        # 4. 사과 획득 확인
+        # 사과 획득 확인
         if self.head == self.food:
             self.score += 1
             reward = 10
@@ -144,7 +144,7 @@ class SnakeGame:
         dir_d = self.direction == Direction.DOWN
 
         state = [
-            # 1. 위험 감지 (직진, 우회전, 좌회전)
+            # 위험 감지 (직진, 우회전, 좌회전)
             (dir_r and self._is_collision(point_r)) or 
             (dir_l and self._is_collision(point_l)) or 
             (dir_u and self._is_collision(point_u)) or 
@@ -160,10 +160,10 @@ class SnakeGame:
             (dir_r and self._is_collision(point_u)) or 
             (dir_l and self._is_collision(point_d)),
             
-            # 2. 이동 방향
+            # 이동 방향
             dir_l, dir_r, dir_u, dir_d,
             
-            # 3. 사과 위치
+            # 사과 위치
             self.food.x < self.head.x,  # Food left
             self.food.x > self.head.x,  # Food right
             self.food.y < self.head.y,  # Food up
@@ -172,24 +172,24 @@ class SnakeGame:
         return np.array(state, dtype=int)
 
     def render(self):
-        # 1. 배경을 검은색으로 지우기 (초기화)
+        # 배경을 검은색으로 지우기
         self.display.fill(BLACK)
         
-        # 2. 뱀 그리기
+        # 뱀 그리기
         for pt in self.snake:
             # 뱀의 몸통 (바깥쪽 꽉 찬 사각형)
             pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
             # 뱀의 몸통 안쪽 (입체감을 위해 살짝 작은 사각형을 덧그림)
             pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x + 4, pt.y + 4, 12, 12))
             
-        # 3. 사과 그리기
+        # 사과 그리기
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
         
-        # 4. 좌측 상단에 현재 점수 표시
+        # 좌측 상단에 현재 점수 표시
         font = pygame.font.SysFont('arial', 25)
         text = font.render("Score: " + str(self.score), True, WHITE)
         self.display.blit(text, [0, 0])
         
-        # 5. 화면 업데이트 및 재생 속도 조절
+        # 화면 업데이트 및 재생 속도 조절
         pygame.display.flip()
         self.clock.tick(SPEED) # __init__ 외부에서 정의한 SPEED(예: 40)에 맞춰 프레임 고정    
