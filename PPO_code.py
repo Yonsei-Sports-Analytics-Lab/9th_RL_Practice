@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.distributions import Categorical
+import numpy as np
 
 # Actor & Critic 클래스
 class ActorCritic(nn.Module):
@@ -27,14 +28,23 @@ class ActorCritic(nn.Module):
             nn.Linear(hidden_dim, 1)
         )
 
-    def act(self, state):
+    def act(self, state, deterministic=False):
         action_probs = self.actor(state)
-        dist = Categorical(action_probs)
-        action = dist.sample()           # 확률에 따라 행동 샘플링
-        action_logprob = dist.log_prob(action)
+        
+        if deterministic:
+            action = torch.argmax(action_probs, dim=-1)
+            action_logprob = None
+        else:
+            dist = Categorical(action_probs)
+            action = dist.sample()           # 확률에 따라 행동 샘플링
+            action_logprob = dist.log_prob(action)
+            
         state_val = self.critic(state)
         
-        return action.item(), action_logprob.item(), state_val.item()
+        if deterministic:
+            return action.detach().cpu().numpy(), None, state_val.detach().cpu().numpy()
+        else:
+            return action.detach().cpu().numpy(), action_logprob.detach().cpu().numpy(), state_val.detach().cpu().numpy()
 
     def evaluate(self, state, action):
         action_probs = self.actor(state)
@@ -63,23 +73,27 @@ class PPO:
         self.MseLoss = nn.MSELoss()
 
     def update(self, memory):
-        # 1. 버퍼(Memory)에서 텐서로 데이터 변환
-        states = torch.FloatTensor(memory.states)
-        actions = torch.LongTensor(memory.actions)
-        logprobs = torch.FloatTensor(memory.logprobs)
-        rewards = memory.rewards
-        dones = memory.dones
+        # 1. 버퍼에서 넘파이 배열로 변환 (shape: steps, num_envs)
+        rewards_arr = np.array(memory.rewards)
+        dones_arr = np.array(memory.dones)
 
-        # 2. 누적 보상(Return) 계산
+        # 2. 누적 보상(Return) 계산 (환경별로 병렬 계산)
         returns = []
-        discounted_reward = 0
-        for reward, done in zip(reversed(rewards), reversed(dones)):
-            if done:
-                discounted_reward = 0
-            discounted_reward = reward + (self.gamma * discounted_reward)
-            returns.insert(0, discounted_reward)
+        # num_envs 크기의 배열로 초기화
+        discounted_reward = np.zeros(rewards_arr.shape[1]) 
+        
+        for reward, done in zip(reversed(rewards_arr), reversed(dones_arr)):
+            # 게임이 끝난 환경(done==True)은 할인된 보상을 0으로 리셋
+            discounted_reward = reward + (self.gamma * discounted_reward * (1 - done.astype(int)))
+            returns.insert(0, discounted_reward.copy())
             
-        returns = torch.FloatTensor(returns)
+        # 3. 모델에 넣기 위해 모든 데이터를 1차원으로 쫙 펴기(Flatten) 및 텐서 변환
+        # states: (steps, num_envs, state_dim) -> (steps * num_envs, state_dim)
+        states = torch.FloatTensor(np.array(memory.states).reshape(-1, np.array(memory.states).shape[-1]))
+        actions = torch.LongTensor(np.array(memory.actions).reshape(-1))
+        logprobs = torch.FloatTensor(np.array(memory.logprobs).reshape(-1))
+        returns = torch.FloatTensor(np.array(returns).reshape(-1))
+
         returns = (returns - returns.mean()) / (returns.std() + 1e-7) # 정규화
 
         # 평균 Loss를 계산하기 위한 변수 초기화
