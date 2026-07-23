@@ -5,7 +5,7 @@ from PPO_code import PPO
 
 def play_saved_model():
     # 뼈대 준비
-    state_dim = 14
+    state_dim = 13
     action_dim = 3
     env = SnakeGame()
     
@@ -14,7 +14,7 @@ def play_saved_model():
     
     # 가중치 불러오기
     # TODO: main.py에서 저장했던 모델 파일 경로 적기
-    model_path = "saved_models/ppo_snake_poo_boo.pth"
+    model_path = "saved_models/ppo_snake_ep7500_score129.pth"
     
     # torch.load로 딕셔너리를 읽고, load_state_dict로 모델에 덮어씌웁니다.
     try:

@@ -20,7 +20,7 @@ def train(policy_path = "", episodes = 10000):
 
     # 초기화
     states = multi_env.reset()
-    state_dim = 14  # 예: 뱀의 상태 데이터 크기
+    state_dim = 13  # 예: 뱀의 상태 데이터 크기
     action_dim = 3  # 예: 직진, 좌, 우
     ppo_agent = PPO(state_dim, action_dim, lr=0.0003, gamma=0.99, epochs=4, eps_clip=0.2)
     memory = RolloutBuffer()
@@ -95,7 +95,7 @@ def train(policy_path = "", episodes = 10000):
 
                     # 모델 저장 로직
                     if global_episodes % save_interval == 0:
-                        torch.save(ppo_agent.policy.state_dict(), f"saved_models/ppo_snake_ep{15500+global_episodes}_score{score}.pth")
+                        torch.save(ppo_agent.policy.state_dict(), f"saved_models/ppo_snake_ep{global_episodes}_score{score}.pth")
 
                     # 해당 환경의 추적 변수만 초기화 (환경 자체는 MultiEnvWrapper에서 자동 reset됨)
                     episode_rewards[i] = 0
@@ -131,4 +131,4 @@ if __name__ == '__main__':
     # 이미 학습된 정책의 추가 학습을 원한다면 아래 from_scratch 값에 False를 넣고 policy_path에 string에 경로를 적으면 됩니다
     from_scratch = True
     policy_path = '' if from_scratch else 'saved_models/ppo_snake_poo_boo.pth'
-    train(policy_path, 10000)
+    train(policy_path, 30000)

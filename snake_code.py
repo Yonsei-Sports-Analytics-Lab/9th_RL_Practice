@@ -251,27 +251,61 @@ class SnakeGame:
         space_right = self._get_accessible_space(next_pts['right']) / total_cells if (straight_right_collision or straight_collision) else space_straight
         space_left = self._get_accessible_space(next_pts['left']) / total_cells if (straight_left_collision or straight_collision) else space_straight
 
+        # 사과 위치 (절대 좌표)
+        food_left = self.food.x < self.head.x
+        food_right = self.food.x > self.head.x
+        food_up = self.food.y < self.head.y
+        food_down = self.food.y > self.head.y
+        
+        # 사과 위치 (상대 방향)
+        food_straight = (dir_r and food_right) or (dir_l and food_left) or (dir_u and food_up) or (dir_d and food_down)
+        food_back = (dir_r and food_left) or (dir_l and food_right) or (dir_u and food_down) or (dir_d and food_up)
+        food_right_rel = (dir_u and food_right) or (dir_d and food_left) or (dir_l and food_up) or (dir_r and food_down)
+        food_left_rel = (dir_d and food_right) or (dir_u and food_left) or (dir_r and food_up) or (dir_l and food_down)
+
+        # 직진, 좌, 우 방향으로 벽 또는 몸까지의 거리
+        dist_straight = self._get_distance_to_obstacle(head, dir_straight)
+        dist_right = self._get_distance_to_obstacle(head, dir_right)
+        dist_left = self._get_distance_to_obstacle(head, dir_left)
+
+        max_dist = max(self.w, self.h) / BLOCK_SIZE
+        norm_dist_straight = dist_straight / max_dist
+        norm_dist_right = dist_right / max_dist
+        norm_dist_left = dist_left / max_dist
+
         state = [
             # 위험 감지 (직진, 우회전, 좌회전)
             straight_collision,
             right_collision,
             left_collision,
             
-            # 이동 방향
-            dir_l, dir_r, dir_u, dir_d,
-            
-            # 사과 위치
-            self.food.x < self.head.x,  # Food left
-            self.food.x > self.head.x,  # Food right
-            self.food.y < self.head.y,  # Food up
-            self.food.y > self.head.y,   # Food down
+            # 사과 위치 (상대 방향)
+            food_straight,
+            food_back,
+            food_right_rel,
+            food_left_rel,
 
             # 공간 감지 센서
             space_straight,
             space_right,
-            space_left
+            space_left,
+
+            # 장애물(벽/몸)까지의 거리
+            norm_dist_straight,
+            norm_dist_right,
+            norm_dist_left
         ]
         return np.array(state, dtype=float)
+
+    def _get_distance_to_obstacle(self, start_pt, direction):
+        dist = 0
+        current = start_pt
+        while True:
+            current = self._get_next_point(current, direction)
+            if self._is_collision(current):
+                break
+            dist += 1
+        return dist
 
     def _get_next_point(self, current_head, direction):
         x, y = current_head.x, current_head.y
