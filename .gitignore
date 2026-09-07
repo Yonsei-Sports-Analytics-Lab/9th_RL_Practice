@@ -4,6 +4,7 @@ runs/
 # PPO policy files
 ppo_snake_*.pth
 ppo_snake_final.pth
+!saved_models/ppo_snake_ep20000_score125.pth
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
