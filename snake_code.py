@@ -172,6 +172,12 @@ class SnakeGame:
         return np.array(state, dtype=int)
 
     def render(self):
+        # pygame 이벤트 큐를 비워주어야 창이 '응답없음' 상태에 빠지지 않습니다.
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
         # 배경을 검은색으로 지우기
         self.display.fill(BLACK)
         

@@ -14,7 +14,7 @@ def play_saved_model():
     
     # 가중치 불러오기
     # TODO: main.py에서 저장했던 모델 파일 경로 적기
-    model_path = "saved_models/ppo_snake_final.pth"
+    model_path = "saved_models/ppo_snake_20000_backup.pth"
     
     # torch.load로 딕셔너리를 읽고, load_state_dict로 모델에 덮어씌웁니다.
     ppo_agent.policy.load_state_dict(torch.load(model_path))
