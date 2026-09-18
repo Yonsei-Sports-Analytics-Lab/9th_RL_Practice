@@ -23,7 +23,7 @@ Point = namedtuple('Point', 'x, y')
 
 # 게임 설정값
 BLOCK_SIZE = 20
-SPEED = 100 # 학습 화면을 볼 때의 속도
+SPEED = 40 # 학습 화면을 볼 때의 속도
 
 class SnakeGame:
     def __init__(self, w=640, h=480):
@@ -32,6 +32,7 @@ class SnakeGame:
         # 화면 출력용 (학습 속도를 높이려면 render() 호출을 생략하면 됩니다)
         self.display = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption('Snake RL')
+        self.paused = False
         self.clock = pygame.time.Clock()
         self.reset()
 
@@ -60,7 +61,21 @@ class SnakeGame:
         if self.food in self.snake:
             self._place_food()
 
+    def _handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.paused = not self.paused
+
     def step(self, action):
+        self._handle_events()
+        while self.paused:
+            self._handle_events()
+            self.clock.tick(15)
+
         self.frame_iteration += 1
         
         # 에이전트의 행동(Action)에 따라 이동

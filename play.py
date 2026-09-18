@@ -32,7 +32,7 @@ def play_saved_model():
             env.render()
             
             # 뱀이 너무 빨리 움직이면 사람 눈에 안 보이므로 의도적인 지연 추가
-            time.sleep(0.02) 
+            time.sleep(0.01) 
             
             state_tensor = torch.FloatTensor(state)
             
