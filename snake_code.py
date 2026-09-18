@@ -35,6 +35,7 @@ class SnakeGame:
         self.w = w
         self.h = h
         self.display = None
+        self.paused = False
         pygame.display.set_caption('Snake RL')
         self.clock = None
         self.reset()
@@ -64,13 +65,20 @@ class SnakeGame:
         if self.food in self.snake:
             self._place_food()
 
-    def step(self, action):
-        # pygame 이벤트 처리 루프
+    def _handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                # 우측 상단의 X 버튼을 눌렀을 때 안전하게 종료되도록 처리
                 pygame.quit()
                 quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.paused = not self.paused
+
+    def step(self, action):
+        self._handle_events()
+        while self.paused:
+            self._handle_events()
+            self.clock.tick(15)
 
         self.frame_iteration += 1
 
