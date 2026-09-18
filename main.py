@@ -95,7 +95,7 @@ def train(policy_path = "", episodes = 10000):
 
                     # 모델 저장 로직
                     if global_episodes % save_interval == 0:
-                        file_path = f"saved_models/14dim/ppo_snake_ep{15500+global_episodes}_score{score}.pth"
+                        file_path = f"saved_models/14dim/ppo_snake_ep{global_episodes}_score{score}.pth"
                         directory = os.path.dirname(file_path)
                         if directory and not os.path.exists(directory):
                             os.makedirs(directory, exist_ok=True)
