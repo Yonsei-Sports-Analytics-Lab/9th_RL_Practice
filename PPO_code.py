@@ -80,7 +80,7 @@ class PPO:
             returns.insert(0, discounted_reward)
             
         returns = torch.FloatTensor(returns)
-        returns = (returns - returns.mean()) / (returns.std() + 1e-7) # 정규화
+        returns = (returns - returns.mean()) / (returns.std() + 1e-7) # 정규화 (1e-7: 분모가 0이 되는 상황 방지)
 
         # 평균 Loss를 계산하기 위한 변수 초기화
         avg_actor_loss = 0

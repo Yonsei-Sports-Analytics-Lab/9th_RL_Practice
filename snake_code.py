@@ -23,7 +23,7 @@ Point = namedtuple('Point', 'x, y')
 
 # 게임 설정값
 BLOCK_SIZE = 20
-SPEED = 40 # 학습 화면을 볼 때의 속도
+SPEED = 100 # 학습 화면을 볼 때의 속도
 
 class SnakeGame:
     def __init__(self, w=640, h=480):
