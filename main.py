@@ -95,7 +95,11 @@ def train(policy_path = "", episodes = 10000):
 
                     # 모델 저장 로직
                     if global_episodes % save_interval == 0:
-                        torch.save(ppo_agent.policy.state_dict(), f"saved_models/ppo_snake_ep{global_episodes}_score{score}.pth")
+                        file_path = f"saved_models/relative_direction/ppo_snake_ep{15500+global_episodes}_score{score}.pth"
+                        directory = os.path.dirname(file_path)
+                        if directory and not os.path.exists(directory):
+                            os.makedirs(directory, exist_ok=True)
+                        torch.save(ppo_agent.policy.state_dict(), file_path)
 
                     # 해당 환경의 추적 변수만 초기화 (환경 자체는 MultiEnvWrapper에서 자동 reset됨)
                     episode_rewards[i] = 0
