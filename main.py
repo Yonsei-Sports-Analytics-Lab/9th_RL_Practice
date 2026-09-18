@@ -87,8 +87,12 @@ def train(policy_path = "", episodes = 10000):
                 print(f"Episode: {episode:4d} | Score: {env.score:2d} | Reward: {episode_reward:6.2f} | Steps: {step_count:3d}")
 
             if episode % save_interval == 0:
-                torch.save(ppo_agent.policy.state_dict(), f"saved_models/ppo_snake_ep{episode}.pth")
-                
+                file_path = f"saved_models/main/ppo_snake_ep{episode}_score{env.score}.pth"
+                directory = os.path.dirname(file_path)
+                if directory and not os.path.exists(directory):
+                    os.makedirs(directory, exist_ok=True)
+                torch.save(ppo_agent.policy.state_dict(), file_path)
+                    
     except KeyboardInterrupt:
         print("\n🛑 학습이 사용자에 의해 중단되었습니다.")
 
