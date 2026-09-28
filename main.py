@@ -9,7 +9,7 @@ from snake_code import SnakeGame
 
 def train(policy_path = "", episodes = 10000):
     # TensorBoard 로그를 저장할 디렉토리 지정
-    writer = SummaryWriter('runs/snake_ppo_experiment_1')
+    writer = SummaryWriter('runs/apple_avoidance_experiment')
 
     # 초기화
     env = SnakeGame()
@@ -87,7 +87,7 @@ def train(policy_path = "", episodes = 10000):
                 print(f"Episode: {episode:4d} | Score: {env.score:2d} | Reward: {episode_reward:6.2f} | Steps: {step_count:3d}")
 
             if episode % save_interval == 0:
-                file_path = f"saved_models/main/ppo_snake_ep{episode}_score{env.score}.pth"
+                file_path = f"saved_models/apple_avoidance/ppo_snake_ep{episode}_score{env.score}.pth"
                 directory = os.path.dirname(file_path)
                 if directory and not os.path.exists(directory):
                     os.makedirs(directory, exist_ok=True)
@@ -98,9 +98,10 @@ def train(policy_path = "", episodes = 10000):
 
     finally:
         # 안전한 종료 처리 (강제 종료되더라도 마지막 모델 저장)
-        os.makedirs("saved_models", exist_ok=True)
-        torch.save(ppo_agent.policy.state_dict(), "saved_models/ppo_snake_final.pth")
-        print("현재까지 학습된 모델이 'saved_models/ppo_snake_final.pth'에 저장되었습니다.")
+        os.makedirs("saved_models/apple_avoidance", exist_ok=True)
+        final_path = "saved_models/apple_avoidance/ppo_snake_final.pth"
+        torch.save(ppo_agent.policy.state_dict(), final_path)
+        print(f"현재까지 학습된 모델이 '{final_path}'에 저장되었습니다.")
         writer.close()
 
 

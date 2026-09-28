@@ -82,7 +82,7 @@ class SnakeGame:
         self._move(action)
         self.snake.insert(0, self.head)
         
-        reward = -0.01 # 스텝 패널티 (지연 방지)
+        reward = 0.05 # 새 목표: 사과를 피하면서 오래 생존하면 보상
         game_over = False
 
         # 게임 종료 조건 확인 (충돌 또는 무한 루프 아사)
@@ -91,9 +91,9 @@ class SnakeGame:
             reward = -10
             return self.get_state(), reward, game_over
 
-        # 조밀한 보상 (Dense Reward) 적용
+        # 사과에서 멀어지는 행동을 장려하는 조밀한 보상
         curr_distance = abs(self.food.x - self.head.x) + abs(self.food.y - self.head.y)
-        if curr_distance < self.prev_distance:
+        if curr_distance > self.prev_distance:
             reward += 0.1
         else:
             reward -= 0.1
@@ -102,8 +102,9 @@ class SnakeGame:
         # 사과 획득 확인
         if self.head == self.food:
             self.score += 1
-            reward = 10
+            reward = -10
             self._place_food()
+            self.prev_distance = abs(self.food.x - self.head.x) + abs(self.food.y - self.head.y)
             self.frame_iteration = 0 # 굶주림 초기화
             # 사과를 먹었으므로 꼬리를 자르지 않음 (길어짐)
         else:
